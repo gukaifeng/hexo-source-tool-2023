@@ -13,6 +13,7 @@ func Main() {
 		Usage: "a tool for reorganizing hexo/source/ directory",
 		Commands: []*cli.Command{
 			cmdInit(),
+			cmdConvert(),
 		},
 	}
 	if err := app.Run(os.Args); err != nil {

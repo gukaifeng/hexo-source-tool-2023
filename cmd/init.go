@@ -155,7 +155,7 @@ func checkSourceDir(srcDir string) error {
 	return err
 }
 
-func handlePosts(srcDir, dstDir string) ([]fileInfo, error) {
+func initHandlePosts(srcDir, dstDir string) ([]fileInfo, error) {
 	srcPostDir := path.Join(srcDir, postSubDir)
 	dstPostDir := path.Join(dstDir, postSubDir)
 
@@ -199,7 +199,7 @@ func handlePosts(srcDir, dstDir string) ([]fileInfo, error) {
 	return filesInfo, nil
 }
 
-func handlePages(srcDir, dstDir string) ([]fileInfo, error) {
+func initHandlePages(srcDir, dstDir string) ([]fileInfo, error) {
 	filesInfo := make([]fileInfo, 0)
 	items, err := os.ReadDir(srcDir)
 	if err != nil {
@@ -248,10 +248,10 @@ func initSource(ctx *cli.Context) error {
 		return err
 	}
 
-	if headers.Posts, err = handlePosts(srcDir, dstDir); err != nil {
+	if headers.Posts, err = initHandlePosts(srcDir, dstDir); err != nil {
 		return err
 	}
-	if headers.Pages, err = handlePages(srcDir, dstDir); err != nil {
+	if headers.Pages, err = initHandlePages(srcDir, dstDir); err != nil {
 		return err
 	}
 
