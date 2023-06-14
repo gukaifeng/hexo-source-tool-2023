@@ -53,7 +53,7 @@ func writeHeader(srcDir, srcFilePath string, file *os.File,
 
 		commitTime, err := ExecCommand(srcDir, "git", "log",
 			"--pretty=format:%ad", "--date=format:\"%Y-%m-%d %H:%M:%S\"",
-			srcFilePath)
+			strings.TrimPrefix(srcFilePath, srcDir+"/"))
 		if err != nil {
 			return err
 		}
