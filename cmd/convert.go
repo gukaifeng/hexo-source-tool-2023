@@ -69,8 +69,13 @@ func writeHeader(srcDir, srcFilePath string, file *os.File,
 	}
 
 	for k, v := range header {
-		if _, err :=
-			file.WriteString(fmt.Sprintf("%v: %v\n", k, v)); err != nil {
+		var err error
+		if k == "title" {
+			_, err = file.WriteString(fmt.Sprintf("%v: %v\n", k, strconv.Quote(v)))
+		} else {
+			_, err = file.WriteString(fmt.Sprintf("%v: %v\n", k, v))
+		}
+		if err != nil {
 			return err
 		}
 	}
