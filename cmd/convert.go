@@ -85,12 +85,12 @@ func writeHeader(srcDir, srcFilePath string, file *os.File,
 	return nil
 }
 
-func writeContent(dstFile *os.File, srcFilePath string) error {
-	srcContent, err := os.ReadFile(srcFilePath)
-	if err != nil {
-		return err
-	}
-	if _, err = dstFile.Write(srcContent); err != nil {
+func readContent(srcFilePath string) ([]byte, error) {
+	return os.ReadFile(srcFilePath)
+}
+
+func writeContent(dstFile *os.File, srcContent []byte) error {
+	if _, err := dstFile.Write(srcContent); err != nil {
 		return err
 	}
 	return nil
@@ -112,11 +112,33 @@ func convertHandlePosts(
 		}
 		defer dstPostFile.Close()
 
+		srcContent, err := readContent(srcPostPath)
+		if err != nil {
+			return err
+		}
+
+		if autofill {
+			if _, ok := finfo.Header["description"]; !ok {
+				description := srcContent[:350]
+				noSpaceDsp := bytes.ReplaceAll(
+					bytes.ReplaceAll(
+						bytes.ReplaceAll(
+							bytes.ReplaceAll(
+								description, []byte("*"), []byte("")),
+							[]byte("#"), []byte("")),
+						[]byte("\r\n"), []byte(" ")),
+					[]byte("\n"), []byte(" "))
+				finfo.Header["description"] =
+					strconv.Quote(
+						strings.TrimSpace(string(noSpaceDsp)) + " ......")
+			}
+		}
+
 		if err = writeHeader(srcDir, srcPostPath, dstPostFile, finfo.Header,
 			autofill); err != nil {
 			return err
 		}
-		if err = writeContent(dstPostFile, srcPostPath); err != nil {
+		if err = writeContent(dstPostFile, srcContent); err != nil {
 			return err
 		}
 	}
@@ -139,11 +161,16 @@ func convertHandlePages(
 		}
 		defer dstPageFile.Close()
 
+		srcContent, err := readContent(srcPagePath)
+		if err != nil {
+			return err
+		}
+
 		if err := writeHeader(srcDir, srcPagePath, dstPageFile, finfo.Header,
 			autofill); err != nil {
 			return err
 		}
-		if err := writeContent(dstPageFile, srcPagePath); err != nil {
+		if err := writeContent(dstPageFile, srcContent); err != nil {
 			return err
 		}
 	}
