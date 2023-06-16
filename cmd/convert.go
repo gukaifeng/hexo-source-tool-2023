@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -85,8 +87,14 @@ func writeHeader(srcDir, srcFilePath string, file *os.File,
 	return nil
 }
 
+func replaceNonPrintableChars(b []byte) []byte {
+	reg := regexp.MustCompile(`[\x00-\x1F\x7F]`)
+	return reg.ReplaceAll(b, []byte{})
+}
+
 func readContent(srcFilePath string) ([]byte, error) {
-	return os.ReadFile(srcFilePath)
+	b, err := os.ReadFile(srcFilePath)
+	return replaceNonPrintableChars(b), err
 }
 
 func writeContent(dstFile *os.File, srcContent []byte) error {
@@ -119,7 +127,8 @@ func convertHandlePosts(
 
 		if autofill {
 			if _, ok := finfo.Header["description"]; !ok {
-				description := srcContent[:350]
+				dsplen := int(math.Min(float64(len(srcContent)), 350))
+				description := srcContent[:dsplen]
 				noSpaceDsp := bytes.ReplaceAll(
 					bytes.ReplaceAll(
 						bytes.ReplaceAll(
