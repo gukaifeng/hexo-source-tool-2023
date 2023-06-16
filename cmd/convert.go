@@ -151,6 +151,16 @@ func convertHandlePosts(
 		if err = writeContent(dstPostFile, srcContent); err != nil {
 			return err
 		}
+
+		filenameWithoutSuffix := strings.Split(finfo.FileName, ".")[0]
+		srcPostAssetDir := path.Join(srcPostsDir, filenameWithoutSuffix)
+		dstPostAssetDir := path.Join(dstPostsDir, filenameWithoutSuffix)
+
+		if err = copyDir(srcPostAssetDir, dstPostAssetDir); err != nil {
+			fmt.Printf("warning -  copy post \"%v\" assset dir failed, "+
+				"you may need handle it manual\n", srcPostPath)
+			continue
+		}
 	}
 	return nil
 }
