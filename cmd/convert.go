@@ -106,7 +106,7 @@ func writeContent(dstFile *os.File, srcContent []byte) error {
 }
 
 func convertHandlePosts(
-	srcDir, dstDir string, finfos []fileInfo, autofill bool) error {
+	srcDir, dstDir string, finfos []fileInfo, autofill, autodesp bool) error {
 	srcPostsDir := path.Join(srcDir, postSubDir)
 	dstPostsDir := path.Join(dstDir, postSubDir)
 	for _, finfo := range finfos {
@@ -126,7 +126,7 @@ func convertHandlePosts(
 			return err
 		}
 
-		if autofill {
+		if autodesp {
 			if _, ok := finfo.Header["description"]; !ok {
 				dsplen := int(math.Min(float64(len(srcContent)), 350))
 				description := srcContent[:dsplen]
@@ -211,6 +211,7 @@ func convert(ctx *cli.Context) error {
 		dstDir   = ctx.Path("destination")
 		force    = ctx.Bool("force")
 		autofill = ctx.Bool("autofill")
+		autodesp = ctx.Bool("autodesp")
 		headers  = headersInfo{}
 		err      error
 	)
@@ -230,7 +231,7 @@ func convert(ctx *cli.Context) error {
 	}
 
 	if err = convertHandlePosts(
-		srcDir, dstDir, headers.Posts, autofill); err != nil {
+		srcDir, dstDir, headers.Posts, autofill, autodesp); err != nil {
 		return err
 	}
 	if err = convertHandlePages(
@@ -272,6 +273,11 @@ func cmdConvert() *cli.Command {
 					"currently include `title`, `date`, and `updated` fields, " +
 					" use --autofill=false to disable this",
 				Value: true,
+			},
+			&cli.BoolFlag{
+				Name:  "autodesp",
+				Usage: "automatically truncate the first part of the article characters as description",
+				Value: false,
 			},
 		},
 	}
