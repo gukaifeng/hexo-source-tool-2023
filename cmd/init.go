@@ -46,6 +46,7 @@ func copyDir(srcDir, dstDir string) error {
 			if err = copyDir(srcPath, dstPath); err != nil {
 				return err
 			}
+			continue
 		}
 
 		srcFile, err := os.Open(srcPath)

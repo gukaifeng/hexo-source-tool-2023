@@ -158,7 +158,7 @@ func convertHandlePosts(
 
 		if err = copyDir(srcPostAssetDir, dstPostAssetDir); err != nil {
 			fmt.Printf("warning -  copy post \"%v\" assset dir failed, "+
-				"you may need handle it manual\n", srcPostPath)
+				"you may need handle it manual, %v\n", srcPostPath, err)
 			continue
 		}
 	}
@@ -172,6 +172,14 @@ func convertHandlePages(
 		dstPageDir := path.Join(dstDir, finfo.FileName)
 		if err := os.MkdirAll(dstPageDir, 0755); err != nil {
 			return err
+		}
+		if err := copyDir(srcPageDir, dstPageDir); err != nil {
+			fmt.Printf("warning -  copy page \"%v\" dir failed, "+
+				"you may need handle it manual, %v\n", srcPageDir, err)
+			continue
+		}
+		if len(finfo.Header) == 0 {
+			continue
 		}
 		srcPagePath := path.Join(srcPageDir, "index.md")
 		dstPagePath := path.Join(dstPageDir, "index.md")
