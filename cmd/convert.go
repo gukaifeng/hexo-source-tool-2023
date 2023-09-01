@@ -89,7 +89,7 @@ func writeHeader(srcDir, srcFilePath string, file *os.File,
 
 func replaceNonPrintableChars(b []byte) []byte {
 	// reg := regexp.MustCompile(`[\x00-\x1F\x7F]`)
-	reg := regexp.MustCompile(`[\x10|\xE5|\x86|\x99]`)
+	reg := regexp.MustCompile(`[\x10\xE5\x86\x99]`)
 	return reg.ReplaceAll(b, []byte{})
 }
 
